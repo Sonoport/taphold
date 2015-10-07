@@ -7,17 +7,20 @@
       }
 
       .card{
+        display:flex;
+        align-items: center;
+        justify-content: center;
         background:#FFF;
         padding:0px;
         margin:15px;
         overflow:hidden;
         width:30%;
         height:40%;
-        border-radius: 10px
+        border-radius: 10px;
+        cursor: pointer;
       }
 
       .title{
-        text-align: center;
         font-family: sans-serif;
       }
 
@@ -25,6 +28,9 @@
         display: flex;
       }
     </style>
+    <script src="http://sdk.sonoport.com/js/2.5.9/models/Looper.js"></script>
+    <script src="http://sdk.sonoport.com/js/2.5.9/models/Trigger.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.4/hammer.js"></script>
   </head>
   <body>
     <div class="row">
@@ -67,7 +73,39 @@
     </div>
 
     <script type="text/javascript">
+      window.addEventListener('load', function(){
+        window.AudioContext = window.AudioContext || window.webkitAudioContext;
+        var context = new AudioContext();
+        var cards = document.querySelectorAll('.card');
+        var triggerIndex = [0,1,2];
+        var looperIndex = [3,4,5];
 
+        window.triggers = [];
+        window.loopers = [];
+
+        triggerIndex.forEach(function(value, index){
+          var div = cards[value];
+          var mc = new Hammer(div);
+          var filename = (index+1)+"-sec.wav";
+          var trigger = new Trigger(context, filename, null, function(){
+              mc.on('tap', trigger.play.bind(trigger));
+          });
+          window.triggers.push(trigger);
+        });
+
+        looperIndex.forEach(function(value, index){
+          var div = cards[value];
+          var mc = new Hammer(div);
+          var filename = (index+1)+"-sec.wav";
+          var looper = new Looper(context, filename, null, function(){
+              mc.on('press', looper.play.bind(looper));
+              mc.on('pressup', function(){
+                looper.release(0, 0.5);
+              })
+          });
+          window.loopers.push(looper);
+        });
+      });
     </script>
   </body>
 </html>
