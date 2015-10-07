@@ -100,7 +100,7 @@
           var looper = new Looper(context, filename, null, function(){
               mc.on('press', looper.play.bind(looper));
               mc.on('pressup', function(){
-                looper.release(0, 0.5);
+                looper.release(0, 0.3);
               })
           });
           window.loopers.push(looper);
