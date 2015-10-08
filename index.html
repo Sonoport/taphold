@@ -14,7 +14,7 @@
         padding:0px;
         margin:15px;
         overflow:hidden;
-        width:30%;
+        width:20%;
         height:40%;
         border-radius: 10px;
         cursor: pointer;
@@ -51,6 +51,18 @@
           Tap + Trigger - 3sec
         </h2>
       </div>
+
+      <div class="card">
+        <h2 class="title">
+          Tap + Trigger - 5sec
+        </h2>
+      </div>
+
+      <div class="card">
+        <h2 class="title">
+          Tap + Trigger - 10sec
+        </h2>
+      </div>
     </div>
     <div class="row">
       <div class="card">
@@ -70,6 +82,18 @@
           Tap&Hold + Looper - 3sec
         </h2>
       </div>
+
+      <div class="card">
+        <h2 class="title">
+          Tap&Hold + Looper - 5sec
+        </h2>
+      </div>
+
+      <div class="card">
+        <h2 class="title">
+          Tap&Hold + Looper - 10sec
+        </h2>
+      </div>
     </div>
 
     <script type="text/javascript">
@@ -77,8 +101,9 @@
         window.AudioContext = window.AudioContext || window.webkitAudioContext;
         var context = new AudioContext();
         var cards = document.querySelectorAll('.card');
-        var triggerIndex = [0,1,2];
-        var looperIndex = [3,4,5];
+        var triggerIndex = [0,1,2,3,4];
+        var looperIndex = [5,6,7,8,9];
+        var secondMapping = [1,2,3,5,10];
 
         window.triggers = [];
         window.loopers = [];
@@ -86,7 +111,7 @@
         triggerIndex.forEach(function(value, index){
           var div = cards[value];
           var mc = new Hammer(div);
-          var filename = (index+1)+"-sec.wav";
+          var filename = secondMapping[index]+"-sec.wav";
           var trigger = new Trigger(context, filename, null, function(){
               mc.on('tap', trigger.play.bind(trigger));
           });
@@ -96,7 +121,7 @@
         looperIndex.forEach(function(value, index){
           var div = cards[value];
           var mc = new Hammer(div);
-          var filename = (index+1)+"-sec.wav";
+          var filename = secondMapping[index]+"-sec.wav";
           var looper = new Looper(context, filename, null, function(){
               mc.on('press', looper.play.bind(looper));
               mc.on('pressup', function(){
