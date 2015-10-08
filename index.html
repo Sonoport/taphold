@@ -6,6 +6,10 @@
         background-color: black
       }
 
+      h3{
+        pointer-events:none;
+      }
+
       .card{
         display:flex;
         align-items: center;
@@ -18,6 +22,10 @@
         height:20%;
         border-radius: 10px;
         cursor: pointer;
+        -webkit-user-select: none;  /* Chrome all / Safari all */
+        -moz-user-select: none;     /* Firefox all */
+        -ms-user-select: none;      /* IE 10+ */
+        user-select: none;          /* Likely future */
       }
 
       .title{
@@ -35,66 +43,65 @@
     </style>
     <script src="http://sdk.sonoport.com/js/2.5.9/models/Looper.js"></script>
     <script src="http://sdk.sonoport.com/js/2.5.9/models/Trigger.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.4/hammer.js"></script>
   </head>
   <body>
     <div class="column">
       <div class="card">
-        <h3 class="title">
+        <h3 class="title" data-model="trigger" data-length=0>
           Tap + Trigger - 1sec
         </h3>
       </div>
 
-      <div class="card">
+      <div class="card" data-model="trigger" data-length=1>
         <h3 class="title">
           Tap + Trigger - 2sec
         </h3>
       </div>
 
-      <div class="card">
+      <div class="card" data-model="trigger" data-length=2>
         <h3 class="title">
           Tap + Trigger - 3sec
         </h3>
       </div>
 
-      <div class="card">
+      <div class="card" data-model="trigger" data-length=3>
         <h3 class="title">
           Tap + Trigger - 5sec
         </h3>
       </div>
 
-      <div class="card">
+      <div class="card" data-model="trigger" data-length=4>
         <h3 class="title">
           Tap + Trigger - 10sec
         </h3>
       </div>
     </div>
     <div class="column">
-      <div class="card">
+      <div class="card" data-model="looper" data-length=0>
         <h3 class="title">
           Tap&Hold + Looper - 1sec
         </h3>
       </div>
 
-      <div class="card">
+      <div class="card" data-model="looper" data-length=2>
         <h3 class="title">
           Tap&Hold + Looper - 2sec
         </h3>
       </div>
 
-      <div class="card">
+      <div class="card" data-model="looper" data-length=2>
         <h3 class="title">
           Tap&Hold + Looper - 3sec
         </h3>
       </div>
 
-      <div class="card">
+      <div class="card" data-model="looper" data-length=3>
         <h3 class="title">
           Tap&Hold + Looper - 5sec
         </h3>
       </div>
 
-      <div class="card">
+      <div class="card" data-model="looper" data-length=4>
         <h3 class="title">
           Tap&Hold + Looper - 10sec
         </h3>
@@ -105,7 +112,6 @@
       window.addEventListener('load', function(){
         window.AudioContext = window.AudioContext || window.webkitAudioContext;
         var context = new AudioContext();
-        var cards = document.querySelectorAll('.card');
         var triggerIndex = [0,1,2,3,4];
         var looperIndex = [5,6,7,8,9];
         var secondMapping = [1,2,3,5,10];
@@ -113,34 +119,43 @@
         window.triggers = [];
         window.loopers = [];
 
-        triggerIndex.forEach(function(value, index){
-          var div = cards[value];
-          var mc = new Hammer(div);
-          var filename = secondMapping[index]+"-sec.wav";
-          var trigger = new Trigger(context, filename, null, function(){
-              mc.on('tap', trigger.play.bind(trigger));
+        document.body.addEventListener('mousedown', function(evt){
+          if (evt.target.dataset.model === 'trigger'){
+            window.triggers[evt.target.dataset.length].play();
+          }else if (evt.target.dataset.model === 'looper'){
+            var looper = window.loopers[evt.target.dataset.length];
+            if (!looper.isPlaying){
+              looper.play();
+            }
+          }
+        });
+
+        document.body.addEventListener('mouseup', function(evt){
+          console.log("mouseup");
+          window.loopers.forEach(function(thisLooper){
+            if (thisLooper.isPlaying){
+              thisLooper.release(0,0.3);
+            }
           });
+        });
+
+        document.body.addEventListener('touchend', function(evt){
+          window.loopers.forEach(function(thisLooper){
+            if (thisLooper.isPlaying){
+              thisLooper.release(0,0.3);
+            }
+          });
+        });
+
+        triggerIndex.forEach(function(value, index){
+          var filename = secondMapping[index]+"-sec.wav";
+          var trigger = new Trigger(context, filename);
           window.triggers.push(trigger);
         });
 
         looperIndex.forEach(function(value, index){
-          var div = cards[value];
-          var mc = new Hammer(div);
           var filename = secondMapping[index]+"-sec.wav";
-          var looper = new Looper(context, filename, null, function(){
-              mc.on('press', function(){
-                if(!looper.isPlaying){
-                  looper.play.bind(looper)
-                }
-              });
-              mc.on('pressup', function(){
-                window.loopers.forEach(function(thisLooper){
-                  if(thisLooper.isPlaying){
-                    thisLooper.release(0, 0.3);
-                  }
-                });
-              })
-          });
+          var looper = new Looper(context, filename);
           window.loopers.push(looper);
         });
       });
