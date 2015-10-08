@@ -128,9 +128,17 @@
           var mc = new Hammer(div);
           var filename = secondMapping[index]+"-sec.wav";
           var looper = new Looper(context, filename, null, function(){
-              mc.on('press', looper.play.bind(looper));
+              mc.on('press', function(){
+                if(!looper.isPlaying){
+                  looper.play.bind(looper)
+                }
+              });
               mc.on('pressup', function(){
-                looper.release(0, 0.3);
+                window.loopers.forEach(function(thisLooper){
+                  if(thisLooper.isPlaying){
+                    thisLooper.release(0, 0.3);
+                  }
+                });
               })
           });
           window.loopers.push(looper);
